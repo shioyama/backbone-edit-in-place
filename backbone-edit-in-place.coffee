@@ -37,6 +37,8 @@ class Backbone.EditView extends Backbone.View
         value = if model.has(key) then model.get(key) else defaultValue
         value = defaultValue if value is ''
 
+        value = value.join(", ") if prop.isArray and value? and value isnt defaultValue
+          
         value = _(value).escape() if escape
         untitled = " data-untitled='true' " if value is defaultValue
 
@@ -146,6 +148,8 @@ class Backbone.EditView extends Backbone.View
     enter   = event.which is 13
     altKey  = event.altKey
 
+    $target.val($target.val().slice(0,-2) + ", ") if $target.val().slice(-2) is "  " and isArray
+
     return true if enter and altKey
     return true unless enter and keyDown
 
@@ -153,6 +157,7 @@ class Backbone.EditView extends Backbone.View
 
     # If there was a change, save it
     if String(newValue) isnt String(oldValue)
+      newValue = _(newValue).compact() if isArray
       attributes = {}
       attributes[key] = newValue
       if @preps?[modelId]?[key]?
