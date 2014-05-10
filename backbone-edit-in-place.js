@@ -67,6 +67,9 @@ Backbone.EditView = (function(_super) {
         if (value === '') {
           value = defaultValue;
         }
+        if (prop.isArray && (value != null) && value !== defaultValue) {
+          value = value.join(", ");
+        }
         if (escape) {
           value = _(value).escape();
         }
@@ -169,6 +172,9 @@ Backbone.EditView = (function(_super) {
     keyDown = event.type === "keydown";
     enter = event.which === 13;
     altKey = event.altKey;
+    if ($target.val().slice(-2) === "  " && isArray) {
+      $target.val($target.val().slice(0, -2) + ", ");
+    }
     if (enter && altKey) {
       return true;
     }
@@ -177,6 +183,9 @@ Backbone.EditView = (function(_super) {
     }
     this.alreadyEditing = false;
     if (String(newValue) !== String(oldValue)) {
+      if (isArray) {
+        newValue = _(newValue).compact();
+      }
       attributes = {};
       attributes[key] = newValue;
       if (((_ref = this.preps) != null ? (_ref1 = _ref[modelId]) != null ? _ref1[key] : void 0 : void 0) != null) {
